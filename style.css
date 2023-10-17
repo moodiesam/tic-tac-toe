@@ -1,0 +1,23 @@
+.main {
+    display: grid;
+    justify-content: center;
+}
+
+.gameboard {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    justify-content: center;
+}
+
+.display {
+    display: grid;
+    grid-template-rows: 50px 50px;
+    align-items: center;
+    justify-content: center;
+}
+
+.announcements {
+    display: grid;
+    justify-content: center;
+}
