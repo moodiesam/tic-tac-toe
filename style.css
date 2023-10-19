@@ -5,14 +5,14 @@
 
 .gameboard {
     display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
+    grid-template-columns: repeat(3, 150px);
+    grid-template-rows: repeat(3, 150px);
     justify-content: center;
 }
 
 .display {
     display: grid;
-    grid-template-rows: 50px 50px;
+    grid-template-rows: 100px 100px;
     align-items: center;
     justify-content: center;
 }

@@ -1,220 +1,168 @@
-let board = [];
-let round = 0;
-const announcements = document.getElementById('announcements');
+//Gameboard object which will control the ui portion once rounds are finished
 
-function createBoard() {
-    announcements.textContent = `${activePlayer.name}` + " it's your turn!";
+const Gameboard = (() => {
+
+    let board = [];
+
+    const getBoard = () => board;
+    
+    const createSquare = (item) => {
+        const gameboard = document.getElementById('gameboard');
+        const squareDiv = document.createElement('button');
+
+        squareDiv.classList.add('square');
+        squareDiv.setAttribute('id', board.indexOf(item))
+        squareDiv.textContent = item;
+        gameboard.appendChild(squareDiv);
+
+        squareDiv.addEventListener('click', () => {
+            if (squareDiv.textContent === '' && DisplayController.getWinnerAnnounced() == false) {
+                board.splice(board.indexOf(item), 1, DisplayController.getActivePlayer().marker)
+            //clear the divs
+                DisplayController.clearSquares();
+            //reload with new array info
+                DisplayController.fillSquares();
+            //check for winner
+                DisplayController.checkWinner();
+            //check for tie
+                DisplayController.checkTie();
+            //announce winner OR
+            //switch active player
+            if (DisplayController.getWinnerAnnounced() == true) {
+                DisplayController.changeActivePlayer();
+                DisplayController.announceWinner();
+                };
+            }
+        });
+    
+    };
+
     for(let i=0; i<9; i++) {
         board[i] = ['']
         createSquare(board[i]);
-    }
-};
-
-function createSquare (item) {
-    const gameboard = document.getElementById('gameboard');
-    const squareDiv = document.createElement('button');
-
-    squareDiv.classList.add('square');
-    squareDiv.setAttribute('id', board.indexOf(item))
-    squareDiv.textContent = item;
-    gameboard.appendChild(squareDiv);
-
-    squareDiv.addEventListener('click', () => {
-        if (squareDiv.textContent === '') {
-            board.splice(board.indexOf(item), 1, activePlayer.marker)
-        //clear the divs
-        clearSquares();
-        //reload with new array info
-        fillSquares();
-        //check for winner
-        checkWinner();
-        //check for tie
-        checkTie();
-        //announce winner OR
-        //switch active player
-        if (winnerAnnounced == true) {
-            announceWinner();
-        } else {changeActivePlayer();}
-        }
-    })
-};
-
-function clearSquares() {
-    const display = document.getElementById('gameboard');
-    const squares = document.querySelectorAll('.square');
-    squares.forEach(square => display.removeChild(square));
-};
-
-function fillSquares() {
-    for(let i=0; i<9; i++){
-        createSquare(board[i]);
-    }
-};
-
-let winnerAnnounced = false;
-
-const winningCombinations = [
-    [0,1,2],
-    [3,4,5],
-    [6,7,8],
-    [0,3,6],
-    [1,4,7],
-    [2,5,8],
-    [0,4,8],
-    [2,4,6]
-];
-
-function checkWinner() {
-    winningCombinations.forEach((item) => {
-        if(board[item[0]] === activePlayer.marker && board[item[1]] === activePlayer.marker && board[item[2]] === activePlayer.marker) {
-            winnerAnnounced = true;
-        } 
-    })
-
-};
-
-function announceWinner() {
-    console.log('wins?')
-    announcements.textContent = `${activePlayer.name}` + " wins the game!";
-    //end game
-    //no more moves (remove event listeners)
-    //ask to reset the game
-};
-
-function checkTie() {
-    round += 1;
-    if (round === 9) {
-        announceTie();
-    }
-};
-
-function announceTie() {
-    announcements.textContent = 'Tie game!';
-    //end game
-    //no more moves (remove event listeners)
-    //ask to reset the game
-}
-
-function changeActivePlayer(){
-    if(activePlayer === players[0]){
-        activePlayer = players[1];
-    } else {
-        activePlayer = players[0];
     };
-    announcements.textContent = `${activePlayer.name}` + " it's your turn!";
-};
 
-//restart button
-
-const playAgain = document.getElementById('playAgainButton');
-playAgain.addEventListener('click', () => {
-    board = [];
-    clearSquares();
-    createBoard();
-    winnerAnnounced = false;
-    announcements.textContent = "Player 1, it's your turn!"
-})
-
-const players = [
-    {
-        name: 'Player 1',
-        marker: 'X'
-    },
-    {
-        name: 'Player 2',
-        marker: 'O'
+    const resetBoard = () => {
+        for(let i=0; i<9; i++) {
+            board[i] = ['']
+            
+        };
     }
-];
 
-let activePlayer = players[0];
+    return { board, createSquare, resetBoard, getBoard };
+})();
 
-createBoard();
+const DisplayController = (() => {
 
+    let board = Gameboard.getBoard();
 
-
-
-
-
-
-
-
-
-
-
-// // creating the boardgame
-// //it represents the state of the BOARD
-
-// let Gameboard = function() {
+    const players = [
+        {
+            name: 'Player 1',
+            marker: 'X'
+        },
+        {
+            name: 'Player 2',
+            marker: 'O'
+        }
+    ];
     
-//     //create the array for the gameboard... 9 empty spaces in the array
-//     let board = [];
+    let activePlayer = players[0];
+    let winnerAnnounced = false;
+    let round = 0;
 
-//     for (i=0; i<9; i++) {
-//         board[i] = [''];
-//     };
-//     const getBoard = () => board;
+    const getActivePlayer = () => activePlayer;
+    const getWinnerAnnounced = () => winnerAnnounced;
     
-//     return {getBoard};
-// }();
 
-// console.log([Gameboard]);
+    const winningCombinations = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]
+    ];
 
-// //create the board
+    const clearSquares = () => {
+        const display = document.getElementById('gameboard');
+        const squares = document.querySelectorAll('.square');
+        squares.forEach(square => display.removeChild(square));
+    };
 
-// function fillBoard () {
-//     for (let i=0; i<9; i++){
-//         createSquare(board)
-//     }
-// }
+    function fillSquares() {
+        for(let i=0; i<9; i++){
+            Gameboard.createSquare(Gameboard.board[i]);
+        };
+    };
+
+    function announceWinner() {
+        announcements.textContent = `${activePlayer.name}` + " wins the game!";
+        //end game
+        //no more moves (remove event listeners)
+        //ask to reset the game
+    };
+
+    function checkWinner() {
+        winningCombinations.forEach((item) => {
+            if(Gameboard.board[item[0]] === activePlayer.marker && Gameboard.board[item[1]] === activePlayer.marker && Gameboard.board[item[2]] === activePlayer.marker) {
+                winnerAnnounced = true;
+            }    
+        })
+        changeActivePlayer();
+    };
+
+    function announceTie() {
+        announcements.textContent = 'Tie game!';
+        //end game
+        //no more moves (remove event listeners)
+        //ask to reset the game
+    };
+
+    function checkTie() {
+        round += 1;
+        if (round === 9) {
+            announceTie();
+        }
+    };
+
+    function changeActivePlayer(){
+        if(activePlayer === players[0]){
+            activePlayer = players[1];
+        } else {
+            activePlayer = players[0];
+        };
+        announcements.textContent = `${activePlayer.name}` + " it's your turn!";
+    };
+
+  
+
+    const playAgain = document.getElementById('playAgainButton');
+    playAgain.addEventListener('click', () => {
+        Gameboard.resetBoard();
+        clearSquares();
+        fillSquares();
+        winnerAnnounced = false;
+        announcements.textContent = "Player 1, it's your turn!"
+    })
+
+    
+    return{ clearSquares,
+        fillSquares,
+        checkWinner,
+        checkTie,
+        announceWinner,
+        announceTie,
+        changeActivePlayer,
+        getActivePlayer,
+        getWinnerAnnounced,
+        board,
+        winnerAnnounced,
+        activePlayer
+    }
+})();
 
 
-// //creating two players (X and O)
 
-// GameController = function() {
-
-//     let board = Gameboard;
-
-//     const players = [
-//         {
-//             name: 'Player One',
-//             marker: 'X'
-//         },
-//         {
-//             name: 'Player Two',
-//             marker: 'O'
-//         }
-//     ];
-
-//     let activePlayer = players[0];
-
-//     // two functions
-//     //1. switching whos turn it is
-//     //2, get the current active player
-
-//     const switchActivePlayer = () => {
-//         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-//     };
-
-//     const getActivePlayer = () => activePlayer;
-
-//     const playRound = () => {
-//         switchActivePlayer();
-//     }
-
-//     // let getActivePlayer = function() {
-//     //     let activePlayer = players[0];
-//     //     return function() {
-//     //         if (activePlayer === players[0]) {
-//     //             activePlayer = players[1];
-//     //         } else {
-//     //             activePlayer = players[0];
-//     //         }
-//     //         return activePlayer;
-//     //     }
-//     // };
-//     // getActivePlayer();
-//     console.log(players);
-//     return {players, playRound, activePlayer};
-// }();
-
-// console.log([GameController]);
